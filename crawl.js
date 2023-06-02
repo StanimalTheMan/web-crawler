@@ -1,7 +1,6 @@
 function normalizeURL(urlString) {
-  // console.log(urlString)
-  // console.log(new URL(urlString))
   const urlStringObj = new URL(urlString)
+  // there seems to be no obvious difference for this function between host and hostname property on URL object?
   const normalizedURLString = urlStringObj.hostname + urlStringObj.pathname
   const normalizedURLStringLen = normalizedURLString.length
   if (normalizedURLString[normalizedURLStringLen - 1] == '/') {
@@ -9,11 +8,6 @@ function normalizeURL(urlString) {
   }
   return normalizedURLString
 }
-
-// console.log(normalizeURL('https://wagslane.dev/path/'))
-// normalizeURL('https://wagsLane.Dev/path')
-// normalizeURL('https://wagslane.dev/path')
-// normalizeURL('http://wagslane.dev/path')
 
 module.exports = {
   normalizeURL
