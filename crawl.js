@@ -9,6 +9,11 @@ function normalizeURL(urlString) {
   return normalizedURLString
 }
 
+function getURLsFromHTML(htmlBody, baseURL) {
+
+}
+
 module.exports = {
-  normalizeURL
+  normalizeURL,
+  getURLsFromHTML
 }
