@@ -74,3 +74,10 @@ test("sorts pages dictionary by values in descending order", () => {
     ["wagslane.dev/posts/developers-learn-to-say-no", 1],
   ]);
 });
+
+test("sortPages null case", () => {
+  const input = {};
+  const actual = sortPages(input);
+  const expected = [];
+  expect(actual).toEqual(expected);
+});
