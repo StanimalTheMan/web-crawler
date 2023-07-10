@@ -3,6 +3,8 @@
 //   output: process.stdout,
 // });
 
+const { crawlPage } = require("./crawl");
+
 function main() {
   const cliArguments = process.argv.slice(2);
   const numCliArguments = cliArguments.length;
@@ -12,9 +14,9 @@ function main() {
     );
     process.exit();
   }
-  console.log(
-    "The web crawler is starting to crawl at the baseURL you entered."
-  );
+  const baseURL = cliArguments[0];
+  console.log(`The web crawler is starting to crawl ${baseURL}.`);
+  crawlPage(baseURL);
 }
 
 main();

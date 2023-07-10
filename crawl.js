@@ -26,7 +26,25 @@ function getURLsFromHTML(htmlBody, baseURL) {
   return urlsFromHTML;
 }
 
+function crawlPage(baseURL) {
+  fetch(baseURL)
+    .then((resp) => {
+      if (resp.status >= 400 && resp.status < 600) {
+        console.log("There was a client/server error.  Try again.");
+        return;
+      }
+      if (resp.headers.get("content-type") !== "text/html; charset=UTF-8") {
+        console.log(resp.headers.get("content-type"));
+        console.log("Invalid content type header format");
+        return;
+      }
+      resp.text().then((htmlBody) => console.log(htmlBody));
+    })
+    .catch((err) => console.log(err));
+}
+
 module.exports = {
   normalizeURL,
   getURLsFromHTML,
+  crawlPage,
 };
