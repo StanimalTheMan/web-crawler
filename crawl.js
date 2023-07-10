@@ -26,42 +26,43 @@ function getURLsFromHTML(htmlBody, baseURL) {
   return urlsFromHTML;
 }
 
-function crawlPage(baseURL, currentURL, pages) {
+async function crawlPage(baseURL, currentURL, pages) {
   // check to avoid crawling internet, just domain in question
-  if (baseURL.hostname !== currentURL.hostname) {
+  const baseURLObj = new URL(baseURL);
+  const currentURLObj = new URL(currentURL);
+  if (baseURLObj.hostname !== currentURLObj.hostname) {
     return pages;
   }
   // get normalized version of the currentURL
   const normalizedCurrentURL = normalizeURL(currentURL);
-  if (normalizedCurrentURL in pages) {
+  if (pages[normalizedCurrentURL] > 0) {
     pages[normalizedCurrentURL]++;
     return pages;
   }
   // haven't made request to current URL, so add to pages tracker
   pages[normalizedCurrentURL] = 1;
-  console.log(normalizedCurrentURL);
-  fetch(currentURL)
-    .then((resp) => {
-      if (resp.status >= 400 && resp.status < 600) {
-        console.log("There was a client/server error.  Try again.");
-        return;
-      }
-      if (resp.headers.get("content-type") !== "text/html; charset=UTF-8") {
-        console.log(resp.headers.get("content-type"));
-        console.log("Invalid content type header format");
-        return;
-      }
-      resp.text().then((htmlBody) => {
-        // assuming all went well with fetch request, get all the URLs from the response body HTML
-        const urlsFromHTML = getURLsFromHTML(htmlBody, baseURL);
-        // recursively crawl each URL found on the page and update pages to keep aggregate count
-        for (const urlFromHTML of urlsFromHTML) {
-          crawlPage(baseURL, urlFromHTML, pages);
-        }
-        return pages;
-      });
-    })
-    .catch((err) => console.log(err));
+
+  let htmlBody = "";
+  try {
+    const resp = await fetch(currentURL);
+    if (resp.status >= 400 && resp.status < 600) {
+      console.log("There was a client/server error.  Try again.");
+      return pages;
+    }
+    if (!resp.headers.get("content-type").includes("text/html")) {
+      console.log(resp.headers.get("content-type"));
+      console.log("Invalid content type header format");
+      return pages;
+    }
+    htmlBody = await resp.text();
+  } catch (err) {
+    console.log(err.message);
+  }
+  const nextURLS = getURLsFromHTML(htmlBody, baseURL);
+  for (const urlFromHTML of nextURLS) {
+    pages = await crawlPage(baseURL, urlFromHTML, pages);
+  }
+  return pages;
 }
 
 module.exports = {

@@ -5,7 +5,7 @@
 
 const { crawlPage } = require("./crawl");
 
-function main() {
+async function main() {
   const cliArguments = process.argv.slice(2);
   const numCliArguments = cliArguments.length;
   if (numCliArguments !== 3) {
@@ -16,7 +16,7 @@ function main() {
   }
   const baseURL = cliArguments[0];
   console.log(`The web crawler is starting to crawl ${baseURL}.`);
-  crawlPage(baseURL, baseURL, {});
+  console.log("result", await crawlPage(baseURL, baseURL, {}));
 }
 
 main();
