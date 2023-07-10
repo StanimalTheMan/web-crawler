@@ -8,7 +8,7 @@ const { crawlPage } = require("./crawl");
 function main() {
   const cliArguments = process.argv.slice(2);
   const numCliArguments = cliArguments.length;
-  if (numCliArguments !== 1) {
+  if (numCliArguments !== 3) {
     console.log(
       "Invalid # of inputs entered: Only enter a base URL such as 'http://www.mlb.com'"
     );
@@ -16,7 +16,7 @@ function main() {
   }
   const baseURL = cliArguments[0];
   console.log(`The web crawler is starting to crawl ${baseURL}.`);
-  crawlPage(baseURL);
+  crawlPage(baseURL, baseURL, {});
 }
 
 main();

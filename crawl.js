@@ -26,8 +26,21 @@ function getURLsFromHTML(htmlBody, baseURL) {
   return urlsFromHTML;
 }
 
-function crawlPage(baseURL) {
-  fetch(baseURL)
+function crawlPage(baseURL, currentURL, pages) {
+  // check to avoid crawling internet, just domain in question
+  if (baseURL.hostname !== currentURL.hostname) {
+    return pages;
+  }
+  // get normalized version of the currentURL
+  const normalizedCurrentURL = normalizeURL(currentURL);
+  if (normalizedCurrentURL in pages) {
+    pages[normalizedCurrentURL]++;
+    return pages;
+  }
+  // haven't made request to current URL, so add to pages tracker
+  pages[normalizedCurrentURL] = 1;
+  console.log(normalizedCurrentURL);
+  fetch(currentURL)
     .then((resp) => {
       if (resp.status >= 400 && resp.status < 600) {
         console.log("There was a client/server error.  Try again.");
@@ -38,7 +51,15 @@ function crawlPage(baseURL) {
         console.log("Invalid content type header format");
         return;
       }
-      resp.text().then((htmlBody) => console.log(htmlBody));
+      resp.text().then((htmlBody) => {
+        // assuming all went well with fetch request, get all the URLs from the response body HTML
+        const urlsFromHTML = getURLsFromHTML(htmlBody, baseURL);
+        // recursively crawl each URL found on the page and update pages to keep aggregate count
+        for (const urlFromHTML of urlsFromHTML) {
+          crawlPage(baseURL, urlFromHTML, pages);
+        }
+        return pages;
+      });
     })
     .catch((err) => console.log(err));
 }
